@@ -1,13 +1,8 @@
-from sqlalchemy import Column, Integer, String, Float, Date, DateTime, Enum
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
-import enum
 
-class GenderEnum(str, enum.Enum):
-    male = "male"
-    female = "female"
-    other = "other"
 
 class Patient(Base):
     __tablename__ = "patients"

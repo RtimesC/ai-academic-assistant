@@ -95,7 +95,7 @@ export default function HealthMonitoringPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {[...records].reverse().slice(0, 15).map(r => (
+                  {records.slice().slice(0, 15).map(r => (
                     <tr key={r.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                       <td style={{ padding: '8px 12px' }}>{new Date(r.recorded_at).toLocaleString('zh-CN')}</td>
                       <td style={{ padding: '8px 12px' }}>{r.systolic_bp ?? '-'}</td>

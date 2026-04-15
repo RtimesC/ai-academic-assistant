@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getPatient, getDashboardSummary, getCarePlans, getMedications } from '../utils/api';
 import { Patient, DashboardSummary, CarePlan, Medication } from '../utils/types';
@@ -46,7 +46,7 @@ export default function PatientDetailPage() {
   const [showMedModal, setShowMedModal] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'medications' | 'care-plans'>('overview');
 
-  const loadData = () => {
+  const loadData = useCallback(() => {
     Promise.all([
       getPatient(patientId),
       getDashboardSummary(patientId).catch(() => null),
@@ -59,9 +59,9 @@ export default function PatientDetailPage() {
       setMedications(meds);
       setLoading(false);
     });
-  };
+  }, [patientId]);
 
-  useEffect(() => { loadData(); }, [patientId]);
+  useEffect(() => { loadData(); }, [loadData]);
 
   if (loading) return <div style={{ textAlign: 'center', padding: 60 }}>加载中...</div>;
   if (!patient) return <div style={{ textAlign: 'center', padding: 60, color: '#c0392b' }}>患者不存在</div>;

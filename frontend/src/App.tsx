@@ -1,10 +1,13 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router-dom';
 import { useLanguage } from './i18n/LanguageContext';
+import PrivateRoute from './components/PrivateRoute';
+import LoginPage from './pages/LoginPage';
 import PatientListPage from './pages/PatientListPage';
 import PatientDetailPage from './pages/PatientDetailPage';
 import AddPatientPage from './pages/AddPatientPage';
 import HealthMonitoringPage from './pages/HealthMonitoringPage';
+import RBACDemoPage from './pages/RBACDemoPage';
 
 const navStyle: React.CSSProperties = {
   background: '#1a5276',
@@ -53,6 +56,27 @@ const langButtonHoverStyle: React.CSSProperties = {
 export default function App() {
   const { t, language, toggleLanguage } = useLanguage();
   const [langButtonHovered, setLangButtonHovered] = React.useState(false);
+  const navigate = useNavigate();
+  const [user, setUser] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      setUser(JSON.parse(userStr));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  // 如果未登录，只显示登录页
+  const token = localStorage.getItem('auth_token');
+  if (!token) {
+    return <LoginPage />;
+  }
 
   return (
     <BrowserRouter>
@@ -62,22 +86,63 @@ export default function App() {
             <span style={{ fontWeight: 700, fontSize: 18, marginRight: 16 }}>{t.nav.title}</span>
             <NavLink to="/" style={({ isActive }) => linkStyle(isActive)} end>{t.nav.patientList}</NavLink>
             <NavLink to="/add-patient" style={({ isActive }) => linkStyle(isActive)}>{t.nav.addPatient}</NavLink>
+            <NavLink to="/rbac-demo" style={({ isActive }) => linkStyle(isActive)}>🔐 RBAC Demo</NavLink>
           </div>
-          <button
-            onClick={toggleLanguage}
-            onMouseEnter={() => setLangButtonHovered(true)}
-            onMouseLeave={() => setLangButtonHovered(false)}
-            style={langButtonHovered ? langButtonHoverStyle : langButtonStyle}
-          >
-            {language === 'zh' ? '中文' : 'English'} | {language === 'zh' ? 'English' : '中文'}
-          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* 用户信息显示 */}
+            <div style={{ color: '#ecf0f1', fontSize: 13 }}>
+              {user && `👤 ${user.username} (${user.role})`}
+            </div>
+            {/* 语言切换 */}
+            <button
+              onClick={toggleLanguage}
+              onMouseEnter={() => setLangButtonHovered(true)}
+              onMouseLeave={() => setLangButtonHovered(false)}
+              style={langButtonHovered ? langButtonHoverStyle : langButtonStyle}
+            >
+              {language === 'zh' ? '中文' : 'English'} | {language === 'zh' ? 'English' : '中文'}
+            </button>
+            {/* 登出 */}
+            <button
+              onClick={handleLogout}
+              style={{
+                ...langButtonStyle,
+                background: 'rgba(231, 76, 60, 0.2)',
+                color: '#e74c3c'
+              }}
+            >
+              登出
+            </button>
+          </div>
         </nav>
         <main style={{ padding: 24, maxWidth: 1200, margin: '0 auto' }}>
           <Routes>
-            <Route path="/" element={<PatientListPage />} />
-            <Route path="/add-patient" element={<AddPatientPage />} />
-            <Route path="/patient/:id" element={<PatientDetailPage />} />
-            <Route path="/patient/:id/health" element={<HealthMonitoringPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={
+              <PrivateRoute requiredRole={['doctor', 'admin']}>
+                <PatientListPage />
+              </PrivateRoute>
+            } />
+            <Route path="/add-patient" element={
+              <PrivateRoute requiredRole={['doctor', 'admin']}>
+                <AddPatientPage />
+              </PrivateRoute>
+            } />
+            <Route path="/patient/:id" element={
+              <PrivateRoute requiredRole={['doctor', 'admin', 'patient']}>
+                <PatientDetailPage />
+              </PrivateRoute>
+            } />
+            <Route path="/patient/:id/health" element={
+              <PrivateRoute requiredRole={['doctor', 'admin', 'patient']}>
+                <HealthMonitoringPage />
+              </PrivateRoute>
+            } />
+            <Route path="/rbac-demo" element={
+              <PrivateRoute requiredRole={['doctor', 'admin', 'patient']}>
+                <RBACDemoPage />
+              </PrivateRoute>
+            } />
           </Routes>
         </main>
       </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router-dom';
+import { Routes, Route, NavLink, useNavigate } from 'react-router-dom';
 import { useLanguage } from './i18n/LanguageContext';
 import PrivateRoute from './components/PrivateRoute';
 import ParticleBackground from './components/ParticleBackground';
@@ -83,81 +83,79 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter>
-      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)' }}>
-        {/* 粒子背景 */}
-        <ParticleBackground />
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)' }}>
+      {/* 粒子背景 */}
+      <ParticleBackground />
 
-        <nav style={navStyle}>
-          <div style={navLeftStyle}>
-            <span style={{
-              fontWeight: 700,
-              fontSize: 20,
-              marginRight: 16,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}>
-              {t.nav.title}
-            </span>
-            <NavLink to="/" style={({ isActive }) => linkStyle(isActive)} end>{t.nav.patientList}</NavLink>
-            <NavLink to="/add-patient" style={({ isActive }) => linkStyle(isActive)}>{t.nav.addPatient}</NavLink>
-            <NavLink to="/rbac-demo" style={({ isActive }) => linkStyle(isActive)}>{t.nav.rbacDemo}</NavLink>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {user && (
-              <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 13, fontWeight: 500 }}>
-                👤 {user.username} ({user.role})
-              </div>
-            )}
-            <button
-              onClick={toggleLanguage}
-              onMouseEnter={() => setLangButtonHovered(true)}
-              onMouseLeave={() => setLangButtonHovered(false)}
-              style={langButtonHovered ? langButtonHoverStyle : langButtonStyle}
-            >
-              {language === 'zh' ? '中文' : 'EN'} | {language === 'zh' ? 'EN' : '中文'}
-            </button>
-            <AppleButton
-              onClick={handleLogout}
-              variant="danger"
-              size="sm"
-            >
-              {t.nav.logout}
-            </AppleButton>
-          </div>
-        </nav>
-        <main style={{ padding: 24, maxWidth: 1400, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/" element={
-              <PrivateRoute requiredRole={['doctor', 'admin']}>
-                <PatientListPage />
-              </PrivateRoute>
-            } />
-            <Route path="/add-patient" element={
-              <PrivateRoute requiredRole={['doctor', 'admin']}>
-                <AddPatientPage />
-              </PrivateRoute>
-            } />
-            <Route path="/patient/:id" element={
-              <PrivateRoute requiredRole={['doctor', 'admin', 'patient']}>
-                <PatientDetailPage />
-              </PrivateRoute>
-            } />
-            <Route path="/patient/:id/health" element={
-              <PrivateRoute requiredRole={['doctor', 'admin', 'patient']}>
-                <HealthMonitoringPage />
-              </PrivateRoute>
-            } />
-            <Route path="/rbac-demo" element={
-              <PrivateRoute requiredRole={['doctor', 'admin', 'patient']}>
-                <RBACDemoPage />
-              </PrivateRoute>
-            } />
-          </Routes>
-        </main>
-      </div>
-    </BrowserRouter>
+      <nav style={navStyle}>
+        <div style={navLeftStyle}>
+          <span style={{
+            fontWeight: 700,
+            fontSize: 20,
+            marginRight: 16,
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}>
+            {t.nav.title}
+          </span>
+          <NavLink to="/" style={({ isActive }) => linkStyle(isActive)} end>{t.nav.patientList}</NavLink>
+          <NavLink to="/add-patient" style={({ isActive }) => linkStyle(isActive)}>{t.nav.addPatient}</NavLink>
+          <NavLink to="/rbac-demo" style={({ isActive }) => linkStyle(isActive)}>{t.nav.rbacDemo}</NavLink>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {user && (
+            <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 13, fontWeight: 500 }}>
+              👤 {user.username} ({user.role})
+            </div>
+          )}
+          <button
+            onClick={toggleLanguage}
+            onMouseEnter={() => setLangButtonHovered(true)}
+            onMouseLeave={() => setLangButtonHovered(false)}
+            style={langButtonHovered ? langButtonHoverStyle : langButtonStyle}
+          >
+            {language === 'zh' ? '中文' : 'EN'} | {language === 'zh' ? 'EN' : '中文'}
+          </button>
+          <AppleButton
+            onClick={handleLogout}
+            variant="danger"
+            size="sm"
+          >
+            {t.nav.logout}
+          </AppleButton>
+        </div>
+      </nav>
+      <main style={{ padding: 24, maxWidth: 1400, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={
+            <PrivateRoute requiredRole={['doctor', 'admin']}>
+              <PatientListPage />
+            </PrivateRoute>
+          } />
+          <Route path="/add-patient" element={
+            <PrivateRoute requiredRole={['doctor', 'admin']}>
+              <AddPatientPage />
+            </PrivateRoute>
+          } />
+          <Route path="/patient/:id" element={
+            <PrivateRoute requiredRole={['doctor', 'admin', 'patient']}>
+              <PatientDetailPage />
+            </PrivateRoute>
+          } />
+          <Route path="/patient/:id/health" element={
+            <PrivateRoute requiredRole={['doctor', 'admin', 'patient']}>
+              <HealthMonitoringPage />
+            </PrivateRoute>
+          } />
+          <Route path="/rbac-demo" element={
+            <PrivateRoute requiredRole={['doctor', 'admin', 'patient']}>
+              <RBACDemoPage />
+            </PrivateRoute>
+          } />
+        </Routes>
+      </main>
+    </div>
   );
 }

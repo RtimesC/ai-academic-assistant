@@ -10,17 +10,10 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('zh');
-  const [mounted, setMounted] = useState(false);
-
-  // Load language preference from localStorage on mount
-  useEffect(() => {
+  const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem('app-language') as Language | null;
-    if (saved && (saved === 'zh' || saved === 'en')) {
-      setLanguage(saved);
-    }
-    setMounted(true);
-  }, []);
+    return (saved === 'zh' || saved === 'en') ? saved : 'zh';
+  });
 
   const toggleLanguage = () => {
     const newLanguage: Language = language === 'zh' ? 'en' : 'zh';
@@ -29,11 +22,6 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const t = translations[language];
-
-  // Avoid rendering until localStorage is checked to prevent hydration mismatch
-  if (!mounted) {
-    return <>{children}</>;
-  }
 
   return (
     <LanguageContext.Provider value={{ language, t, toggleLanguage }}>

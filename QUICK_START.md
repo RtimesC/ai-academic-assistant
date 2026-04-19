@@ -1,87 +1,113 @@
-# 🚀 快速启动清单
+# 🚀 项目启动指南
 
-## ✅ 已完成的优化工作
+## 第一步：环境准备（网络通行证）
 
-### 1. npm 漏洞修复 ✓
-- [x] 运行 `npm audit fix` 检测和修复可修复的漏洞
-- [x] 创建 `.npmrc` 优化 npm 安装速度
-- [x] 配置文件现在使用最新的官方 npm 源
-- **结果:** 9 个低风险漏洞已修复，高风险漏洞为开发依赖（不影响生产）
+每次打开新的终端窗口时，为了防止拉取环境或调用外部接口失败，先声明代理（**确保代理软件已开启"允许局域网连接"**）：
 
-### 2. 前端启动性能优化 ✓
-- [x] 创建 `.env.local` 跳过预检查：
-  - `SKIP_PREFLIGHT_CHECK=true` - 跳过 ESLint 预检查
-  - `DISABLE_ESLINT_PLUGIN=true` - 禁用 ESLint 插件
-  - `PORT=3000` - 明确指定端口
-
-- [x] 优化 `tsconfig.json`：
-  - `strict: false` - 加快类型检查
-  - `incremental: true` - 启用增量编译
-  
-- [x] 优化 `package.json` 脚本
-
-### 3. Docker 配置优化 ✓
-- [x] 修改 `docker-compose.yml`：
-  - 添加性能优化环境变量
-  - 跳过 npm audit 检查
-  - 修改 API 地址为容器内部通信
-
-- [x] 创建 `.dockerignore` 减少镜像体积
-
----
-
-## 🌐 启动应用
-
-### 方式 1：使用启动脚本
 ```bash
-# Windows
-.\start.bat
-
-# Mac/Linux
-bash start.sh
+export HTTP_PROXY="http://192.168.1.109:7890"
+export HTTPS_PROXY="http://192.168.1.109:7890"
 ```
 
-### 方式 2：手动启动
+> **⚠️ 注意：** 如果你的局域网 IP 变了，记得替换上面的数字
+
+---
+
+## 第二步：一键启动项目
+
+在终端中，确保你处于项目文件夹目录下（即包含 `docker-compose.yml` 的目录），执行：
+
 ```bash
-docker-compose up
+docker compose up -d
+```
+
+> **说明：** 加上 `-d` 表示在后台运行，这样你的终端还能继续敲其他命令
+
+---
+
+## 第三步：检查与使用
+
+### ✅ 确认是否成功运行
+
+```bash
+docker ps
+```
+
+看到 `frontend` 和 `backend` 的状态都是 `Up` 即可！
+
+### 🌐 在浏览器中访问
+
+| 应用 | 地址 |
+|------|------|
+| 🖥️ 前端页面 (用户界面) | http://localhost:3000 |
+| ⚙️ 后端接口文档 (Swagger UI) | http://localhost:8000/docs |
+
+---
+
+## 第四步：日常调试（查看日志）
+
+如果代码报错或者页面没反应，想看看后台输出：
+
+```bash
+# 查看所有容器的实时滚动日志
+docker compose logs -f
+
+# 如果只想看后端的日志
+docker compose logs -f backend
+
+# 如果只想看前端的日志
+docker compose logs -f frontend
+```
+
+> **按 `Ctrl + C` 退出日志查看**
+
+---
+
+## 第五步：结束一天的工作（停止运行）
+
+不想开发了，或者准备关机前，释放电脑资源：
+
+```bash
+# 彻底关闭并移除临时网络（推荐）
+docker compose down
+
+# 或者：仅仅暂停它们（保留当前状态）
+docker compose stop
 ```
 
 ---
 
-## 📍 应用地址
+## 📝 配置文件说明
 
-- **前端：** http://localhost:3000
-- **后端 API：** http://localhost:8000
-- **API 文档：** http://localhost:8000/docs
+该项目已进行以下优化：
+
+- **`.env.local`** - 前端开发环境变量，跳过预检查和优化启动速度
+- **`.npmrc`** - npm 配置文件，优化安装速度和兼容性
+- **`.dockerignore`** - Docker 构建忽略文件，减少镜像体积
+- **`STARTUP_GUIDE.md`** - 详细的启动和排查指南
 
 ---
 
-## ⚠️ 首次启动会比较慢
+## 🆘 故障排除
 
-Docker 容器中的 npm install 会耗时 3-5 分钟，这是正常的：
-- 需要下载所有依赖包
-- 在容器内编译 native modules
-- 建议在后台运行，不要中断
+### 问题：Docker 容器无法启动
 
-可以在另一个终端查看日志：
+**检查 Docker 是否运行：**
 ```bash
-docker-compose logs frontend -f
+docker ps
 ```
 
----
+### 问题：无法访问 localhost:3000
 
-## 🔧 如果 localhost 仍然打不开
-
-1. **确认 Docker 正常运行：**
+1. **检查容器是否成功启动：**
    ```bash
-   docker ps
-   # 应该显示两个容器都在运行 (Up)
+   docker-compose ps
    ```
 
-2. **检查容器日志：**
+2. **查看容器日志：**
    ```bash
-   docker logs ai-academic-assistant-frontend-1
-   docker logs ai-academic-assistant-backend-1
+   docker-compose logs backend
+   docker-compose logs frontend
    ```
 
 3. **重启容器：**
@@ -92,38 +118,27 @@ docker-compose logs frontend -f
 4. **完全重建：**
    ```bash
    docker-compose down
-   docker-compose up --build
+   docker-compose up --build -d
    ```
 
----
+### 问题：端口被占用
 
-## 📊 优化对比
+```bash
+# 检查端口占用（Windows）
+netstat -ano | findstr :3000
 
-| 指标 | 优化前 | 优化后 |
-|------|--------|--------|
-| npm 漏洞 | 26 个 | 修复大部分 |
-| ESLint 检查 | 开启 | 跳过 |
-| 类型检查严格度 | 高 | 低（快速开发） |
-| Docker npm 命令 | `npm ci` | `npm install --no-audit` |
+# 检查端口占用（Mac/Linux）
+lsof -i :3000
+```
 
----
-
-## 📝 新增文件说明
-
-- **`STARTUP_GUIDE.md`** - 详细的启动和排查指南
-- **`start.sh`** - Linux/Mac 启动脚本
-- **`start.bat`** - Windows 启动脚本
-- **`.env.local`** - 前端开发环境变量
-- **`.npmrc`** - npm 配置文件
-- **`.dockerignore`** - Docker 构建忽略文件
+如果端口被占用，修改 `docker-compose.yml` 中的端口配置后重启。
 
 ---
 
-## 下一步
+## 💡 小贴士
 
-1. 运行启动脚本或 `docker-compose up`
-2. 等待 npm install 完成（3-5 分钟）
-3. 在浏览器打开 http://localhost:3000
-4. 应用应该正常加载！
+- **首次启动较慢：** Docker 容器中的 npm install 会耗时 3-5 分钟，这是正常的，建议在后台运行
+- **跳过代理：** 如果你在公司网络内不需要代理，可以跳过第一步
+- **快速开发：** 可以直接在本地开发（不使用 Docker），详见 `STARTUP_GUIDE.md`
 
-如有问题，查看 STARTUP_GUIDE.md 的排查部分。
+更多详细信息，请查看 `STARTUP_GUIDE.md`！

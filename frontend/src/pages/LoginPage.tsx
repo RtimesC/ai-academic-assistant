@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../i18n/LanguageContext';
+import ParticleBackground from '../components/ParticleBackground';
+import AppleButton from '../components/AppleButton';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -27,7 +29,6 @@ export default function LoginPage() {
       }
 
       const data = await res.json();
-      // 保存 token 和用户信息
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
@@ -40,114 +41,211 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    }}>
-      <div style={{
-        background: '#fff',
-        borderRadius: 12,
-        padding: 40,
-        width: 380,
-        boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
-      }}>
-        <h1 style={{ textAlign: 'center', marginBottom: 8, color: '#2c3e50' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      {/* 粒子背景 */}
+      <ParticleBackground />
+
+      {/* 主卡片 */}
+      <div
+        style={{
+          background: 'rgba(15, 23, 42, 0.8)',
+          backdropFilter: 'blur(20px)',
+          borderRadius: 20,
+          padding: 40,
+          width: 380,
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          position: 'relative',
+          zIndex: 10,
+        }}
+      >
+        {/* 背景光晕效果 */}
+        <div
+          style={{
+            position: 'absolute',
+            top: -50,
+            right: -50,
+            width: 200,
+            height: 200,
+            background: 'radial-gradient(circle, rgba(102, 126, 234, 0.2) 0%, transparent 70%)',
+            borderRadius: '50%',
+            filter: 'blur(40px)',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: -50,
+            left: -50,
+            width: 200,
+            height: 200,
+            background: 'radial-gradient(circle, rgba(118, 75, 162, 0.2) 0%, transparent 70%)',
+            borderRadius: '50%',
+            filter: 'blur(40px)',
+          }}
+        />
+
+        <h1
+          style={{
+            textAlign: 'center',
+            marginBottom: 8,
+            color: '#fff',
+            fontSize: 32,
+            fontWeight: 700,
+            letterSpacing: '-0.5px',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
           🏥 AI 护理助手
         </h1>
-        <p style={{ textAlign: 'center', color: '#7f8c8d', marginBottom: 32 }}>
+        <p
+          style={{
+            textAlign: 'center',
+            color: 'rgba(255, 255, 255, 0.6)',
+            marginBottom: 32,
+            fontSize: 14,
+            fontWeight: 500,
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
           医疗机构管理系统
         </p>
 
         {error && (
-          <div style={{
-            background: '#fadbd8',
-            color: '#c0392b',
-            padding: 12,
-            borderRadius: 6,
-            marginBottom: 16,
-            fontSize: 14
-          }}>
+          <div
+            style={{
+              background: 'rgba(245, 87, 108, 0.1)',
+              color: '#f5576c',
+              padding: 12,
+              borderRadius: 10,
+              marginBottom: 16,
+              fontSize: 14,
+              border: '1px solid rgba(245, 87, 108, 0.3)',
+              position: 'relative',
+              zIndex: 1,
+            }}
+          >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleLogin} style={{ position: 'relative', zIndex: 1 }}>
           <div style={{ marginBottom: 16 }}>
-            <label style={{ display: 'block', marginBottom: 6, color: '#2c3e50', fontWeight: 500 }}>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: 8,
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontWeight: 600,
+                fontSize: 14,
+              }}
+            >
               用户名
             </label>
             <input
               type="text"
               value={username}
-              onChange={e => setUsername(e.target.value)}
+              onChange={(e) => setUsername(e.target.value)}
               placeholder="请输入用户名"
               style={{
                 width: '100%',
-                padding: '10px 12px',
-                border: '1px solid #ddd',
-                borderRadius: 6,
-                fontSize: 14,
-                boxSizing: 'border-box'
+                padding: '12px 16px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: 10,
+                fontSize: 15,
+                boxSizing: 'border-box',
+                color: '#fff',
+                transition: 'all 0.3s ease',
+                outline: 'none',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.border = '1px solid rgba(102, 126, 234, 0.5)';
+                e.currentTarget.style.boxShadow = '0 0 15px rgba(102, 126, 234, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             />
           </div>
 
           <div style={{ marginBottom: 24 }}>
-            <label style={{ display: 'block', marginBottom: 6, color: '#2c3e50', fontWeight: 500 }}>
+            <label
+              style={{
+                display: 'block',
+                marginBottom: 8,
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontWeight: 600,
+                fontSize: 14,
+              }}
+            >
               密码
             </label>
             <input
               type="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="请输入密码"
               style={{
                 width: '100%',
-                padding: '10px 12px',
-                border: '1px solid #ddd',
-                borderRadius: 6,
-                fontSize: 14,
-                boxSizing: 'border-box'
+                padding: '12px 16px',
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: 10,
+                fontSize: 15,
+                boxSizing: 'border-box',
+                color: '#fff',
+                transition: 'all 0.3s ease',
+                outline: 'none',
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.border = '1px solid rgba(102, 126, 234, 0.5)';
+                e.currentTarget.style.boxShadow = '0 0 15px rgba(102, 126, 234, 0.2)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                e.currentTarget.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.boxShadow = 'none';
               }}
             />
           </div>
 
-          <button
+          <AppleButton
             type="submit"
             disabled={loading}
-            style={{
-              width: '100%',
-              padding: 12,
-              background: '#667eea',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 6,
-              fontSize: 16,
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1
-            }}
+            size="lg"
+            style={{ width: '100%' }}
           >
             {loading ? '登录中...' : '登录'}
-          </button>
+          </AppleButton>
         </form>
 
         {/* 测试账户信息 */}
-        <div style={{
-          marginTop: 24,
-          padding: 12,
-          background: '#f0f4f8',
-          borderRadius: 6,
-          fontSize: 12,
-          color: '#555'
-        }}>
-          <p style={{ margin: '0 0 6px 0', fontWeight: 600 }}>📌 测试账户：</p>
-          <p style={{ margin: '4px 0' }}>👨‍⚕️ 医生: doctor / 123456</p>
-          <p style={{ margin: '4px 0' }}>👤 管理员: admin / 123456</p>
-          <p style={{ margin: '4px 0' }}>🏥 患者: patient / 123456</p>
+        <div
+          style={{
+            marginTop: 24,
+            padding: 14,
+            background: 'rgba(102, 126, 234, 0.05)',
+            borderRadius: 10,
+            fontSize: 12,
+            color: 'rgba(255, 255, 255, 0.7)',
+            border: '1px solid rgba(102, 126, 234, 0.2)',
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
+          <p style={{ margin: '0 0 8px 0', fontWeight: 700, color: '#667eea' }}>
+            📌 测试账户：
+          </p>
+          <p style={{ margin: '6px 0' }}>👨‍⚕️ doctor / 123456</p>
+          <p style={{ margin: '6px 0' }}>👤 admin / 123456</p>
+          <p style={{ margin: '6px 0' }}>🏥 patient / 123456</p>
         </div>
       </div>
     </div>

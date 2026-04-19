@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router-dom';
 import { useLanguage } from './i18n/LanguageContext';
 import PrivateRoute from './components/PrivateRoute';
+import ParticleBackground from './components/ParticleBackground';
+import AppleButton from './components/AppleButton';
 import LoginPage from './pages/LoginPage';
 import PatientListPage from './pages/PatientListPage';
 import PatientDetailPage from './pages/PatientDetailPage';
@@ -10,14 +12,16 @@ import HealthMonitoringPage from './pages/HealthMonitoringPage';
 import RBACDemoPage from './pages/RBACDemoPage';
 
 const navStyle: React.CSSProperties = {
-  background: '#1a5276',
+  background: 'linear-gradient(90deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 27, 75, 0.8) 100%)',
+  backdropFilter: 'blur(20px)',
   color: '#fff',
   padding: '0 24px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  height: 56,
-  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+  height: 60,
+  boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+  borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
 };
 
 const navLeftStyle: React.CSSProperties = {
@@ -27,30 +31,31 @@ const navLeftStyle: React.CSSProperties = {
 };
 
 const linkStyle = (isActive: boolean): React.CSSProperties => ({
-  color: isActive ? '#aed6f1' : '#ecf0f1',
+  color: isActive ? '#667eea' : 'rgba(255, 255, 255, 0.7)',
   textDecoration: 'none',
-  fontWeight: isActive ? 700 : 400,
+  fontWeight: isActive ? 700 : 500,
   fontSize: 15,
-  borderBottom: isActive ? '2px solid #aed6f1' : '2px solid transparent',
+  borderBottom: isActive ? '2px solid #667eea' : '2px solid transparent',
   paddingBottom: 4,
-  transition: 'all 0.2s',
+  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
 });
 
 const langButtonStyle: React.CSSProperties = {
-  background: 'rgba(255, 255, 255, 0.15)',
-  color: '#ecf0f1',
-  border: '1px solid rgba(255, 255, 255, 0.3)',
-  padding: '6px 12px',
-  borderRadius: 4,
+  background: 'rgba(255, 255, 255, 0.08)',
+  color: '#fff',
+  border: '1px solid rgba(255, 255, 255, 0.15)',
+  padding: '8px 14px',
+  borderRadius: 8,
   cursor: 'pointer',
-  fontSize: 13,
-  transition: 'all 0.2s',
-  fontWeight: 500,
+  fontSize: 12,
+  fontWeight: 600,
+  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+  backdropFilter: 'blur(10px)',
 };
 
 const langButtonHoverStyle: React.CSSProperties = {
   ...langButtonStyle,
-  background: 'rgba(255, 255, 255, 0.25)',
+  background: 'rgba(255, 255, 255, 0.12)',
 };
 
 export default function App() {
@@ -72,7 +77,6 @@ export default function App() {
     navigate('/login');
   };
 
-  // 如果未登录，只显示登录页
   const token = localStorage.getItem('auth_token');
   if (!token) {
     return <LoginPage />;
@@ -80,42 +84,50 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div style={{ minHeight: '100vh', background: '#f4f6f8' }}>
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%)' }}>
+        {/* 粒子背景 */}
+        <ParticleBackground />
+
         <nav style={navStyle}>
           <div style={navLeftStyle}>
-            <span style={{ fontWeight: 700, fontSize: 18, marginRight: 16 }}>{t.nav.title}</span>
-            <NavLink to="/" style={({ isActive }) => linkStyle(isActive)} end>{t.nav.patientList}</NavLink>
-            <NavLink to="/add-patient" style={({ isActive }) => linkStyle(isActive)}>{t.nav.addPatient}</NavLink>
+            <span style={{
+              fontWeight: 700,
+              fontSize: 20,
+              marginRight: 16,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}>
+              🏥 AI 护理助手
+            </span>
+            <NavLink to="/" style={({ isActive }) => linkStyle(isActive)} end>患者列表</NavLink>
+            <NavLink to="/add-patient" style={({ isActive }) => linkStyle(isActive)}>添加患者</NavLink>
             <NavLink to="/rbac-demo" style={({ isActive }) => linkStyle(isActive)}>🔐 RBAC Demo</NavLink>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* 用户信息显示 */}
-            <div style={{ color: '#ecf0f1', fontSize: 13 }}>
-              {user && `👤 ${user.username} (${user.role})`}
-            </div>
-            {/* 语言切换 */}
+            {user && (
+              <div style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: 13, fontWeight: 500 }}>
+                👤 {user.username} ({user.role})
+              </div>
+            )}
             <button
               onClick={toggleLanguage}
               onMouseEnter={() => setLangButtonHovered(true)}
               onMouseLeave={() => setLangButtonHovered(false)}
               style={langButtonHovered ? langButtonHoverStyle : langButtonStyle}
             >
-              {language === 'zh' ? '中文' : 'English'} | {language === 'zh' ? 'English' : '中文'}
+              {language === 'zh' ? '中文' : 'EN'} | {language === 'zh' ? 'EN' : '中文'}
             </button>
-            {/* 登出 */}
-            <button
+            <AppleButton
               onClick={handleLogout}
-              style={{
-                ...langButtonStyle,
-                background: 'rgba(231, 76, 60, 0.2)',
-                color: '#e74c3c'
-              }}
+              variant="danger"
+              size="sm"
             >
               登出
-            </button>
+            </AppleButton>
           </div>
         </nav>
-        <main style={{ padding: 24, maxWidth: 1200, margin: '0 auto' }}>
+        <main style={{ padding: 24, maxWidth: 1400, margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/" element={

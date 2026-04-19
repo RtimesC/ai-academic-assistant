@@ -34,7 +34,7 @@ export default function LoginPage() {
 
       navigate('/');
     } catch (err) {
-      setError('用户名或密码错误');
+      setError(t.login.loginError);
     } finally {
       setLoading(false);
     }
@@ -97,7 +97,7 @@ export default function LoginPage() {
             zIndex: 1,
           }}
         >
-          🏥 AI 护理助手
+          {t.login.title}
         </h1>
         <p
           style={{
@@ -110,7 +110,7 @@ export default function LoginPage() {
             zIndex: 1,
           }}
         >
-          医疗机构管理系统
+          {t.login.subtitle}
         </p>
 
         {error && (
@@ -142,13 +142,13 @@ export default function LoginPage() {
                 fontSize: 14,
               }}
             >
-              用户名
+              {t.login.username}
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="请输入用户名"
+              placeholder={t.login.usernamePlaceholder}
               style={{
                 width: '100%',
                 padding: '12px 16px',
@@ -184,13 +184,13 @@ export default function LoginPage() {
                 fontSize: 14,
               }}
             >
-              密码
+              {t.login.password}
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="请输入密码"
+              placeholder={t.login.passwordPlaceholder}
               style={{
                 width: '100%',
                 padding: '12px 16px',
@@ -222,7 +222,7 @@ export default function LoginPage() {
             size="lg"
             style={{ width: '100%' }}
           >
-            {loading ? '登录中...' : '登录'}
+            {loading ? t.login.loginLoading : t.login.loginButton}
           </AppleButton>
         </form>
 
@@ -241,7 +241,7 @@ export default function LoginPage() {
           }}
         >
           <p style={{ margin: '0 0 8px 0', fontWeight: 700, color: '#667eea' }}>
-            📌 测试账户：
+            {t.login.testAccounts}
           </p>
           <p style={{ margin: '6px 0' }}>👨‍⚕️ doctor / 123456</p>
           <p style={{ margin: '6px 0' }}>👤 admin / 123456</p>

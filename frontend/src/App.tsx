@@ -98,11 +98,11 @@ export default function App() {
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
             }}>
-              🏥 AI 护理助手
+              {t.nav.title}
             </span>
-            <NavLink to="/" style={({ isActive }) => linkStyle(isActive)} end>患者列表</NavLink>
-            <NavLink to="/add-patient" style={({ isActive }) => linkStyle(isActive)}>添加患者</NavLink>
-            <NavLink to="/rbac-demo" style={({ isActive }) => linkStyle(isActive)}>🔐 RBAC Demo</NavLink>
+            <NavLink to="/" style={({ isActive }) => linkStyle(isActive)} end>{t.nav.patientList}</NavLink>
+            <NavLink to="/add-patient" style={({ isActive }) => linkStyle(isActive)}>{t.nav.addPatient}</NavLink>
+            <NavLink to="/rbac-demo" style={({ isActive }) => linkStyle(isActive)}>{t.nav.rbacDemo}</NavLink>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             {user && (
@@ -123,7 +123,7 @@ export default function App() {
               variant="danger"
               size="sm"
             >
-              登出
+              {t.nav.logout}
             </AppleButton>
           </div>
         </nav>

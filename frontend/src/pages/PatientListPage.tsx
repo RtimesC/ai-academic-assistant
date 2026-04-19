@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../i18n/LanguageContext';
 import { getPatients } from '../utils/api';
 import { Patient } from '../utils/types';
 
@@ -12,16 +13,8 @@ const levelColors: Record<string, string> = {
   crisis: '#c0392b',
 };
 
-const levelLabels: Record<string, string> = {
-  mild: '轻度',
-  moderate: '中度',
-  severe: '重度',
-  stage1: '1期',
-  stage2: '2期',
-  crisis: '危象',
-};
-
 export default function PatientListPage() {
+  const { t } = useLanguage();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -30,28 +23,28 @@ export default function PatientListPage() {
   useEffect(() => {
     getPatients()
       .then(setPatients)
-      .catch(() => setError('无法加载患者列表，请确保后端服务正在运行'))
+      .catch(() => setError(t.patientList.error))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 60 }}>加载中...</div>;
+  if (loading) return <div style={{ textAlign: 'center', padding: 60 }}>{t.patientList.loading}</div>;
 
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#2c3e50' }}>患者列表</h1>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#2c3e50' }}>{t.patientList.title}</h1>
         <button
           onClick={() => navigate('/add-patient')}
           style={{ background: '#1a5276', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 20px', cursor: 'pointer', fontSize: 15 }}
         >
-          + 添加患者
+          {t.patientList.addButton}
         </button>
       </div>
       {error && <div style={{ background: '#fadbd8', color: '#c0392b', padding: 12, borderRadius: 6, marginBottom: 16 }}>{error}</div>}
       {patients.length === 0 && !error && (
         <div style={{ textAlign: 'center', padding: 60, color: '#7f8c8d' }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>👥</div>
-          <div>暂无患者记录，请先添加患者</div>
+          <div>{t.patientList.empty}</div>
         </div>
       )}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
@@ -75,7 +68,11 @@ export default function PatientListPage() {
               <div>
                 <div style={{ fontWeight: 700, fontSize: 18, color: '#2c3e50' }}>{patient.name}</div>
                 <div style={{ color: '#7f8c8d', fontSize: 13 }}>
-                  {patient.age} 岁 · {patient.gender === 'male' ? '男' : patient.gender === 'female' ? '女' : '其他'}
+                  {patient.age}岁 · {
+                    patient.gender === 'male' ? t.patientList.genders.male :
+                    patient.gender === 'female' ? t.patientList.genders.female :
+                    t.patientList.genders.other
+                  }
                 </div>
               </div>
               <div style={{ fontSize: 28 }}>👤</div>
@@ -89,7 +86,7 @@ export default function PatientListPage() {
                   padding: '2px 8px',
                   fontSize: 12
                 }}>
-                  痴呆 {levelLabels[patient.dementia_stage] || patient.dementia_stage}
+                  痴呆 {t.patientList.severityLevels[patient.dementia_stage as keyof typeof t.patientList.severityLevels] || patient.dementia_stage}
                 </span>
               )}
               {patient.hypertension_level && (
@@ -100,7 +97,7 @@ export default function PatientListPage() {
                   padding: '2px 8px',
                   fontSize: 12
                 }}>
-                  高血压 {levelLabels[patient.hypertension_level] || patient.hypertension_level}
+                  高血压 {t.patientList.severityLevels[patient.hypertension_level as keyof typeof t.patientList.severityLevels] || patient.hypertension_level}
                 </span>
               )}
             </div>

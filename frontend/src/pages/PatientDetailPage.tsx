@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useLanguage } from '../i18n/LanguageContext';
 import { getPatient, getDashboardSummary, getCarePlans, getMedications } from '../utils/api';
 import { Patient, DashboardSummary, CarePlan, Medication } from '../utils/types';
 import AddHealthRecordModal from '../components/AddHealthRecordModal';
@@ -26,16 +27,10 @@ const priorityBorder: Record<string, string> = {
   low: '#27ae60',
 };
 
-const priorityLabels: Record<string, string> = {
-  critical: '紧急',
-  high: '重要',
-  medium: '建议',
-  low: '一般',
-};
-
 export default function PatientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const patientId = parseInt(id!);
   const [patient, setPatient] = useState<Patient | null>(null);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
@@ -63,8 +58,27 @@ export default function PatientDetailPage() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 60 }}>加载中...</div>;
-  if (!patient) return <div style={{ textAlign: 'center', padding: 60, color: '#c0392b' }}>患者不存在</div>;
+  if (loading) return <div style={{ textAlign: 'center', padding: 60 }}>{t.patientDetail.loading}</div>;
+  if (!patient) return <div style={{ textAlign: 'center', padding: 60, color: '#c0392b' }}>{t.patientDetail.notFound}</div>;
+
+  const getGenderLabel = (gender: string) => {
+    if (gender === 'male') return t.patientList.genders.male;
+    if (gender === 'female') return t.patientList.genders.female;
+    return t.patientList.genders.other;
+  };
+
+  const getPriorityLabel = (priority: string): string => {
+    if (priority === 'critical') return t.patientDetail.priorities.urgent;
+    if (priority === 'high') return t.patientDetail.priorities.important;
+    if (priority === 'medium') return t.patientDetail.priorities.recommend;
+    return t.patientDetail.priorities.general;
+  };
+
+  const getCarePlanStatusLabel = (status: string): string => {
+    if (status === 'active') return t.patientDetail.carePlan.status.active;
+    if (status === 'completed') return t.patientDetail.carePlan.status.completed;
+    return t.patientDetail.carePlan.status.cancelled;
+  };
 
   return (
     <div>
@@ -74,7 +88,7 @@ export default function PatientDetailPage() {
         <div>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: '#2c3e50' }}>{patient.name}</h1>
           <div style={{ color: '#7f8c8d', fontSize: 14 }}>
-            {patient.age} 岁 · {patient.gender === 'male' ? '男' : patient.gender === 'female' ? '女' : '其他'}
+            {patient.age}岁 · {getGenderLabel(patient.gender)}
             {patient.phone && ` · 📞 ${patient.phone}`}
           </div>
         </div>
@@ -83,13 +97,13 @@ export default function PatientDetailPage() {
             onClick={() => navigate(`/patient/${patientId}/health`)}
             style={{ background: '#2980b9', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', cursor: 'pointer' }}
           >
-            📈 健康监控
+            {t.patientDetail.healthMonitor}
           </button>
           <button
             onClick={() => setShowHealthModal(true)}
             style={{ background: '#27ae60', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', cursor: 'pointer' }}
           >
-            + 录入健康数据
+            {t.patientDetail.addHealthRecord}
           </button>
         </div>
       </div>
@@ -97,7 +111,9 @@ export default function PatientDetailPage() {
       {/* Alerts */}
       {summary && summary.alerts.critical_count > 0 && (
         <div style={{ background: '#fadbd8', border: '1px solid #c0392b', borderRadius: 8, padding: 16, marginBottom: 16 }}>
-          <div style={{ fontWeight: 700, color: '#c0392b', marginBottom: 8 }}>⚠️ 紧急警报 ({summary.alerts.critical_count})</div>
+          <div style={{ fontWeight: 700, color: '#c0392b', marginBottom: 8 }}>
+            {t.patientDetail.alerts.replace('{count}', summary.alerts.critical_count.toString())}
+          </div>
           {summary.alerts.alerts.filter(a => a.type === 'critical').map((alert, i) => (
             <div key={i} style={{ marginBottom: 4 }}>
               <strong>{alert.category}：</strong>{alert.message} <em style={{ color: '#e74c3c' }}>→ {alert.action}</em>
@@ -106,31 +122,31 @@ export default function PatientDetailPage() {
         </div>
       )}
 
-      {/* Risk Score */}
+      {/* Risk Score Cards */}
       {summary && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 24 }}>
           <div style={{ background: '#fff', borderRadius: 10, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', textAlign: 'center' }}>
             <div style={{ fontSize: 36, fontWeight: 700, color: riskColors[summary.risk_assessment.overall_level] }}>
               {summary.risk_assessment.risk_score}
             </div>
-            <div style={{ color: '#7f8c8d', fontSize: 13 }}>风险评分</div>
+            <div style={{ color: '#7f8c8d', fontSize: 13 }}>{t.patientDetail.cards.riskScore}</div>
             <div style={{ fontWeight: 600, color: riskColors[summary.risk_assessment.overall_level] }}>
               {summary.risk_assessment.overall_label}
             </div>
           </div>
           <div style={{ background: '#fff', borderRadius: 10, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', textAlign: 'center' }}>
             <div style={{ fontSize: 36, fontWeight: 700, color: '#2980b9' }}>{summary.active_medications_count}</div>
-            <div style={{ color: '#7f8c8d', fontSize: 13 }}>当前用药数</div>
+            <div style={{ color: '#7f8c8d', fontSize: 13 }}>{t.patientDetail.cards.currentMedications}</div>
           </div>
           <div style={{ background: '#fff', borderRadius: 10, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', textAlign: 'center' }}>
             <div style={{ fontSize: 36, fontWeight: 700, color: summary.alerts.total_alerts > 0 ? '#e67e22' : '#27ae60' }}>
               {summary.alerts.total_alerts}
             </div>
-            <div style={{ color: '#7f8c8d', fontSize: 13 }}>健康警报</div>
+            <div style={{ color: '#7f8c8d', fontSize: 13 }}>{t.patientDetail.cards.healthAlerts}</div>
           </div>
           <div style={{ background: '#fff', borderRadius: 10, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', textAlign: 'center' }}>
             <div style={{ fontSize: 36, fontWeight: 700, color: '#8e44ad' }}>{summary.recommendations.total_count}</div>
-            <div style={{ color: '#7f8c8d', fontSize: 13 }}>护理建议</div>
+            <div style={{ color: '#7f8c8d', fontSize: 13 }}>{t.patientDetail.cards.careRecommendations}</div>
           </div>
         </div>
       )}
@@ -149,7 +165,9 @@ export default function PatientDetailPage() {
               marginBottom: -2,
             }}
           >
-            {tab === 'overview' ? '概览 & AI建议' : tab === 'medications' ? '用药管理' : '护理计划'}
+            {tab === 'overview' && t.patientDetail.tabs.overview}
+            {tab === 'medications' && t.patientDetail.tabs.medications}
+            {tab === 'care-plans' && t.patientDetail.tabs.carePlan}
           </button>
         ))}
       </div>
@@ -159,9 +177,9 @@ export default function PatientDetailPage() {
         <div>
           {/* Risk Factors */}
           <div style={{ background: '#fff', borderRadius: 10, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', marginBottom: 16 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>🔍 风险因素分析</h2>
+            <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t.patientDetail.riskFactors.title}</h2>
             {summary.risk_assessment.risk_factors.length === 0 ? (
-              <div style={{ color: '#27ae60' }}>✅ 暂无明显风险因素</div>
+              <div style={{ color: '#27ae60' }}>{t.patientDetail.riskFactors.noRisk}</div>
             ) : (
               summary.risk_assessment.risk_factors.map((rf, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
@@ -179,7 +197,7 @@ export default function PatientDetailPage() {
 
           {/* Recommendations */}
           <div style={{ background: '#fff', borderRadius: 10, padding: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>💡 AI 护理建议</h2>
+            <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 12 }}>{t.patientDetail.careAdvice.title}</h2>
             {summary.recommendations.recommendations.map((rec, i) => (
               <div key={i} style={{
                 background: priorityColors[rec.priority] || '#f8f9fa',
@@ -197,7 +215,7 @@ export default function PatientDetailPage() {
                     borderRadius: 3,
                     padding: '1px 6px',
                   }}>
-                    {priorityLabels[rec.priority] || rec.priority}
+                    {getPriorityLabel(rec.priority)}
                   </span>
                 </div>
                 <div style={{ color: '#555', fontSize: 14 }}>{rec.recommendation}</div>
@@ -214,11 +232,11 @@ export default function PatientDetailPage() {
               onClick={() => setShowMedModal(true)}
               style={{ background: '#1a5276', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 16px', cursor: 'pointer' }}
             >
-              + 添加药物
+              {t.patientDetail.medications.addButton}
             </button>
           </div>
           {medications.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 40, color: '#7f8c8d' }}>暂无用药记录</div>
+            <div style={{ textAlign: 'center', padding: 40, color: '#7f8c8d' }}>{t.patientDetail.medications.empty}</div>
           ) : (
             <div style={{ display: 'grid', gap: 12 }}>
               {medications.map(med => (
@@ -226,9 +244,9 @@ export default function PatientDetailPage() {
                   <div>
                     <div style={{ fontWeight: 700, color: '#2c3e50' }}>{med.name}</div>
                     <div style={{ color: '#7f8c8d', fontSize: 13 }}>
-                      {med.dosage && `剂量：${med.dosage} · `}
-                      {med.frequency && `频率：${med.frequency} · `}
-                      {med.purpose && `用途：${med.purpose}`}
+                      {med.dosage && `${t.patientDetail.medications.dose}${med.dosage} · `}
+                      {med.frequency && `${t.patientDetail.medications.frequency}${med.frequency} · `}
+                      {med.purpose && `${t.patientDetail.medications.purpose}${med.purpose}`}
                     </div>
                     {med.notes && <div style={{ color: '#95a5a6', fontSize: 12, marginTop: 4 }}>{med.notes}</div>}
                   </div>
@@ -237,7 +255,7 @@ export default function PatientDetailPage() {
                     color: med.is_active ? '#27ae60' : '#95a5a6',
                     borderRadius: 4, padding: '3px 10px', fontSize: 13, fontWeight: 600
                   }}>
-                    {med.is_active ? '使用中' : '已停用'}
+                    {med.is_active ? t.patientDetail.medications.status.active : t.patientDetail.medications.status.discontinued}
                   </span>
                 </div>
               ))}
@@ -249,7 +267,7 @@ export default function PatientDetailPage() {
       {activeTab === 'care-plans' && (
         <div>
           {carePlans.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 40, color: '#7f8c8d' }}>暂无护理计划</div>
+            <div style={{ textAlign: 'center', padding: 40, color: '#7f8c8d' }}>{t.patientDetail.carePlan.empty}</div>
           ) : (
             <div style={{ display: 'grid', gap: 12 }}>
               {carePlans.map(plan => (
@@ -261,13 +279,13 @@ export default function PatientDetailPage() {
                       color: plan.status === 'active' ? '#27ae60' : '#95a5a6',
                       borderRadius: 4, padding: '3px 10px', fontSize: 13
                     }}>
-                      {plan.status === 'active' ? '执行中' : plan.status === 'completed' ? '已完成' : '已取消'}
+                      {getCarePlanStatusLabel(plan.status)}
                     </span>
                   </div>
                   {plan.description && <div style={{ color: '#555', fontSize: 14, marginBottom: 8 }}>{plan.description}</div>}
-                  {plan.goals && <div style={{ color: '#555', fontSize: 14 }}><strong>目标：</strong>{plan.goals}</div>}
-                  {plan.interventions && <div style={{ color: '#555', fontSize: 14 }}><strong>干预措施：</strong>{plan.interventions}</div>}
-                  {plan.created_by && <div style={{ color: '#95a5a6', fontSize: 12, marginTop: 6 }}>制定人：{plan.created_by}</div>}
+                  {plan.goals && <div style={{ color: '#555', fontSize: 14 }}><strong>{t.patientDetail.carePlan.fields.goal}</strong>{plan.goals}</div>}
+                  {plan.interventions && <div style={{ color: '#555', fontSize: 14 }}><strong>{t.patientDetail.carePlan.fields.interventions}</strong>{plan.interventions}</div>}
+                  {plan.created_by && <div style={{ color: '#95a5a6', fontSize: 12, marginTop: 6 }}>{t.patientDetail.carePlan.fields.createdBy}{plan.created_by}</div>}
                 </div>
               ))}
             </div>

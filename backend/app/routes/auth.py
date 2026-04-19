@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from typing import Optional
-import jwt
+from jose import jwt
 import hashlib
 from pydantic import BaseModel
 
@@ -144,7 +144,7 @@ def verify_token_endpoint(token: str):
         return {"valid": False}
 
 @router.get("/me", response_model=UserResponse)
-def get_current_user_info(token: str = None, db: Session = Depends(get_db)):
+async def get_current_user_info(token: str = None, db: Session = Depends(get_db)):
     """获取当前用户信息"""
     user = await get_current_user(token, db)
     return UserResponse(

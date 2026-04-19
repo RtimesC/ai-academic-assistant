@@ -1,0 +1,15 @@
+# Exclude venv directory
+venv/
+
+# Exclude node_modules directory
+node_modules/
+
+# Exclude Python cache files
+__pycache__/
+*.pyc
+
+# Exclude log files
+*.log
+
+# Exclude environment variable files
+.env

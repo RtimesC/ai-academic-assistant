@@ -3,12 +3,12 @@
 ## English
 
 ### 1) Project Overview
-AI Academic Assistant is a full-stack AI-enabled care/academic assistant system with:
+AI Academic Assistant is a full-stack AI-enabled assistant platform. The current implementation is focused on healthcare management workflows, with:
 - Frontend: React + TypeScript
 - Backend: FastAPI + SQLAlchemy
 - Deployment: Docker Compose for one-command local startup
 
-The current backend API title is **AI Care Assistant API**, and it includes authentication, RBAC, and audit logging support.
+The backend API is currently named **AI Care Assistant API**, and includes authentication, RBAC, and audit logging support.
 
 ### 2) Core Capabilities
 - JWT-based login and token verification
@@ -111,6 +111,8 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - doctor / 123456
 - patient / 123456
 
+> ⚠️ For development/demo only. Change or disable these default accounts before any production deployment.
+
 ### 8) Available Frontend Commands
 ```bash
 cd frontend
@@ -130,7 +132,7 @@ This repository also includes:
 ## 中文
 
 ### 1）项目概述
-AI Academic Assistant 是一个全栈的 AI 辅助系统，主要由以下部分构成：
+AI Academic Assistant 是一个全栈 AI 辅助平台。当前实现主要聚焦于医疗照护管理场景，主要由以下部分构成：
 - 前端：React + TypeScript
 - 后端：FastAPI + SQLAlchemy
 - 部署：使用 Docker Compose 一键本地启动
@@ -237,6 +239,8 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 - admin / 123456
 - doctor / 123456
 - patient / 123456
+
+> ⚠️ 仅用于开发/演示环境。任何生产部署前请务必修改或禁用这些默认账号。
 
 ### 8）前端常用命令
 ```bash

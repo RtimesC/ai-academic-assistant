@@ -1,23 +1,23 @@
 # AI Academic Assistant
 
-This project provides various academic tools for students and researchers.
-
-## Language Switch
-[English](./docs/README.md) | 中文
+## 介绍
+欢迎使用AI学术助手，它结合了最新的人工智能技术和学术领域的需求，为学术研究提供强大的支持。
 
 ## Features
-- Tool 1
-- Tool 2
-- Tool 3
+- **AI-Powered**: Leverage advanced AI algorithms to enhance research efficiency.
+- **User-Friendly**: An intuitive interface designed for researchers of all levels.
+- **Multi-Lingual Support**: Supports both English and Chinese to cater to a diverse user base.
 
-## Installation
-Instructions to install the package.
+## 安装与使用
+1. 下载仓库。  
+2. 安装依赖。  
+3. 运行助手程序。
 
-## Usage
-Instructions on how to use the tool.
-
-## Contributing
-Guidelines for contributing to the project.
+## 贡献
+我们欢迎任何形式的贡献！请查看贡献指南。
 
 ## License
-Information on the project license.
+MIT License
+
+## Contact
+如有任何问题，请通过邮件联系我们。
